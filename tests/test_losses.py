@@ -5,7 +5,9 @@ Each test verifies a single physical property of the loss functions.
 """
 
 import numpy as np
-from plasma_sim.losses import synchrotron_loss
+   from plasma_sim.losses import synchrotron_loss, inverse_compton_loss
+
+"SYNCHROTRON LOSS TESTS"
 
 
 def test_synchrotron_loss_is_negative():
@@ -50,3 +52,54 @@ def test_synchrotron_loss_is_zero_for_zero_field():
     Then: result must be zero since B=0
     """
     assert synchrotron_loss(gamma=1e4, B=0.0) == 0.0
+
+
+
+"COMPTON LOSS TESTS"
+ 
+
+
+def test_inverse_compton_loss_is_negative():
+    """Test that inverse Compton loss always removes energy from the electron.
+
+    Given: an electron with a typical Lorentz factor at redshift zero
+    When: the inverse Compton loss rate is computed
+    Then: the result must be negative since electrons only lose energy
+    """
+    assert inverse_compton_loss(gamma=1e4, redshift=0.0) < 0
+
+
+def test_inverse_compton_loss_scales_with_gamma_squared():
+    """Test that inverse Compton loss scales as gamma squared.
+
+    Given: two el. with Lorentz factors differing by a factor of 2
+    When: inverse Compton loss rate is computed for both
+    Then: loss rate ratio must equal the square of the gamma ratio
+    """
+    loss_1 = inverse_compton_loss(gamma=1e4, redshift=0.0)
+    loss_2 = inverse_compton_loss(gamma=2e4, redshift=0.0)
+    assert np.isclose(loss_2 / loss_1, 4.0, rtol=1e-5)
+
+
+def test_inverse_compton_loss_increases_with_redshift():
+    """Test that inverse Compton loss increases with redshift.
+
+    Given: two identical el. at different redshifts
+    When: inverse Compton loss rate is computed for both
+    Then: loss at higher redshift must be larger because U_rad scales as (1+z)^4
+    """
+    loss_z0 = inverse_compton_loss(gamma=1e4, redshift=0.0)
+    loss_z1 = inverse_compton_loss(gamma=1e4, redshift=1.0)
+    assert abs(loss_z1) > abs(loss_z0)
+
+
+def test_inverse_compton_loss_scales_with_redshift():
+    """Test that inverse Compton loss scales as (1+z)^4 with redshift.
+
+    Given: two identical el. at redshift 0 and redshift 1
+    When: inverse Compton loss rate is computed for both
+    Then: loss rate ratio must equal (1+1)^4 / (1+0)^4 = 16
+    """
+    loss_z0 = inverse_compton_loss(gamma=1e4, redshift=0.0)
+    loss_z1 = inverse_compton_loss(gamma=1e4, redshift=1.0)
+    assert np.isclose(loss_z1 / loss_z0, 16.0, rtol=1e-5)
