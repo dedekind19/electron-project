@@ -5,8 +5,10 @@ Each function returns dγ/dt for a single loss process, given the current
 Lorentz factor and the relevant physical parameters.
 """
 
-from plasma_sim.constants import SIGMA_T, C, M_E, MU_0
+from plasma_sim.constants import SIGMA_T, C, M_E, MU_0, U_RAD_0
 
+
+"SYNCHROTRON"
 
 def synchrotron_loss(gamma: float, B: float) -> float:
     """Compute the synchrotron energy loss rate dγ/dt.
@@ -28,3 +30,27 @@ def synchrotron_loss(gamma: float, B: float) -> float:
     """
     U_B = B**2 / (2 * MU_0)
     return -(4 / 3) * (SIGMA_T * C) / (M_E * C**2) * gamma**2 * U_B
+
+
+"INVERSE COMPTON"
+
+def inverse_compton_loss(gamma: float, redshift: float) -> float:
+    """Compute the inverse Compton energy loss rate dγ/dt.
+
+    dγ/dt = -(4/3) * (σ_T * c) / (m_e * c²) * γ² * U_rad
+    where U_rad = U_RAD_0 * (1 + z)^4
+
+    Parameters
+    ----------
+    gamma : float
+        Lorentz factor of the electron (dimensionless)
+    redshift : float
+        Redshift of the source (dimensionless), scales the CMB energy density
+
+    Returns
+    -------
+    float
+        dγ/dt due to inverse Compton scattering (s^-1), always <= 0
+    """
+    U_rad = U_RAD_0 * (1 + redshift)**4
+    return -(4 / 3) * (SIGMA_T * C) / (M_E * C**2) * gamma**2 * U_rad
