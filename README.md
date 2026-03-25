@@ -20,8 +20,11 @@ galaxy lobes where synchrotron radiation is produced.
 ### Assumptions
 
 - Electrons are **ultra-relativistic**, described by Lorentz factor γ >> 1
-- Magnetic field **B** is uniform and constant, justified for large-scale
-  lobes where B ~ 1-100 μG over scales of tens of kpc
+- Magnetic field **B** is initialised by the user and updated every
+  `B_update_steps` timesteps by sampling from a Gaussian distribution
+  centred on the initial value with standard deviation `sigma_B`. This
+  accounts for turbulent fluctuations in the lobe while keeping B
+  correlated on scales larger than the electron mean free path
 - **Boundary conditions are neglected**: the cooling length λ_cool for all
   processes is much smaller than the typical lobe size (~10-100 kpc), so
   electrons lose all their energy before reaching the boundary
@@ -31,6 +34,9 @@ galaxy lobes where synchrotron radiation is produced.
   this condition is satisfied by several orders of magnitude, making the
   Klein-Nishina correction negligible
 - The plasma is fully ionized hydrogen (Z=1)
+- The initial Lorentz factors of the electrons are sampled from a power law
+  distribution N(γ) ∝ γ^(-p) with γ_min ~ 100 and γ_max ~ 10⁶, typical
+  for radio galaxy lobes (Longair 2011, Chapter 16)
 
 ### Energy Loss Processes
 
@@ -115,6 +121,24 @@ and are tracked as the population evolves.
 
 ---
 
+
+### Monte Carlo Method
+
+Synchrotron and inverse Compton are treated as **continuous** losses and
+applied at every timestep. Bremsstrahlung and Coulomb collisions are
+treated as **discrete** stochastic events: at each timestep, a random
+number is drawn and compared to the interaction probability:
+```
+p = 1 - exp(-dt / t_collision)
+
+t_collision = 1 / (n_plasma * σ_eff * c)
+```
+
+If the random number is less than p, the interaction occurs and the
+corresponding energy loss is applied. This correctly models the discrete
+nature of individual collisions.
+
+
 ## Installation
 
 Requires Python >= 3.10.
@@ -145,19 +169,23 @@ Example `configs/default.json`:
 ```json
 {
   "physical": {
-    "B_field":        1e-9,
-    "n_plasma":       1e3,
-    "gamma_initial":  1e4,
-    "gamma_min":      10.0,
-    "epsilon_stop":   0.01,
-    "t_snap":         1e12,
-    "redshift":       0.0
+    "B_field":         1e-9,
+    "sigma_B":         1e-10,
+    "n_plasma":        1e3,
+    "gamma_min_init":  100,
+    "gamma_max_init":  1e6,
+    "spectral_index":  2.0,
+    "gamma_min":       10.0,
+    "epsilon_stop":    0.01,
+    "t_snap":          1e12,
+    "redshift":        0.0
   },
   "numerical": {
-    "dt":             1e9,
-    "n_electrons":    1000,
-    "n_bins":         50,
-    "random_seed":    42
+    "dt":              1e9,
+    "n_electrons":     1000,
+    "n_bins":          50,
+    "random_seed":     42,
+    "B_update_steps":  100
   }
 }
 ```
