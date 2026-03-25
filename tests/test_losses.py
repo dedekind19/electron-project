@@ -5,7 +5,7 @@ Each test verifies a single physical property of the loss functions.
 """
 
 import numpy as np
-   from plasma_sim.losses import synchrotron_loss, inverse_compton_loss
+from plasma_sim.losses import synchrotron_loss, inverse_compton_loss
 
 "SYNCHROTRON LOSS TESTS"
 
