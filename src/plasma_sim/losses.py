@@ -11,7 +11,7 @@ from plasma_sim.constants import SIGMA_T, C, M_E, MU_0, U_RAD_0, ALPHA_F
 "SYNCHROTRON"
 
 def synchrotron_loss(gamma: float, B: float) -> float:
-    """Compute the synchrotron energy loss rate dγ/dt.
+    """Compute synchrotron energy loss rate dγ/dt.
 
     dγ/dt = -(4/3) * (σ_T * c) / (m_e * c²) * γ² * U_B
     where U_B = B² / (2 * μ₀)
@@ -26,7 +26,7 @@ def synchrotron_loss(gamma: float, B: float) -> float:
     Returns
     -------
     float
-        dγ/dt due to synchrotron radiation (s^-1), always <= 0
+        dγ/dt due to synch. radiation (s^-1), always <= 0
     """
     U_B = B**2 / (2 * MU_0)
     return -(4 / 3) * (SIGMA_T * C) / (M_E * C**2) * gamma**2 * U_B
@@ -43,14 +43,14 @@ def inverse_compton_loss(gamma: float, redshift: float) -> float:
     Parameters
     ----------
     gamma : float
-        Lorentz factor of the electron (dimensionless)
+        Lorentz factor of the electron
     redshift : float
-        Redshift of the source (dimensionless), scales the CMB energy density
+        Redshift of the source , scales the CMB energy density
 
     Returns
     -------
     float
-        dγ/dt due to inverse Compton scattering (s^-1), always <= 0
+        dγ/dt due to inv. Compton scattering (s^-1), always <= 0
     """
     U_rad = U_RAD_0 * (1 + redshift)**4
     return -(4 / 3) * (SIGMA_T * C) / (M_E * C**2) * gamma**2 * U_rad
@@ -65,7 +65,7 @@ def bremsstrahlung_loss(gamma: float, n_plasma: float) -> float:
     Parameters
     ----------
     gamma : float
-        Lorentz factor of the electron (dimensionless)
+        Lorentz factor of the electron 
     n_plasma : float
         Plasma electron number density (m^-3)
 
@@ -75,3 +75,27 @@ def bremsstrahlung_loss(gamma: float, n_plasma: float) -> float:
         dγ/dt due to bremsstrahlung (s^-1), always <= 0
     """
     return -n_plasma * C * SIGMA_T * ALPHA_F * gamma * 14.3
+
+
+"COULOMB"
+
+def coulomb_loss(gamma: float, n_plasma: float) -> float:
+    """Compute the Coulomb energy loss rate dγ/dt.
+
+    dγ/dt = -n_e * c * σ_T / (8 * α_f) * (1/γ) * ln(Λ)
+    where ln(Λ) ≈ 30 is the Coulomb logarithm.
+
+    Parameters
+    ----------
+    gamma : float
+        Lorentz factor of the electron 
+    n_plasma : float
+        Plasma electron number density (m^-3)
+
+    Returns
+    -------
+    float
+        dγ/dt due to Coulomb collisions (s^-1), always <= 0
+    """
+    COULOMB_LOG = 30.0
+    return -n_plasma * C * SIGMA_T / (8 * ALPHA_F) * (1 / gamma) * COULOMB_LOG
