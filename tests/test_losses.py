@@ -5,17 +5,17 @@ Each test verifies a single physical property of the loss functions.
 """
 
 import numpy as np
-from plasma_sim.losses import synchrotron_loss, inverse_compton_loss
+from plasma_sim.losses import synchrotron_loss, inverse_compton_loss, bremsstrahlung_loss
 
 "SYNCHROTRON LOSS TESTS"
 
 
 def test_synchrotron_loss_is_negative():
-    """Test that synchrotron loss always removes energy from the electron.
+    """Test that synchrotron loss always removes energy from the el..
 
-    Given: an electron with a typical Lorentz factor and a typical magnetic field
+    Given: an el. with a typical Lorentz factor and a typical magnetic field
     When: the synchrotron loss rate is computed
-    Then: the result must be negative since electrons only lose energy
+    Then: the result must be negative since el. only lose energy
     """
     assert synchrotron_loss(gamma=1e4, B=1e-9) < 0
 
@@ -60,11 +60,11 @@ def test_synchrotron_loss_is_zero_for_zero_field():
 
 
 def test_inverse_compton_loss_is_negative():
-    """Test that inverse Compton loss always removes energy from the electron.
+    """Test that inverse Compton loss always removes energy from the el..
 
-    Given: an electron with a typical Lorentz factor at redshift zero
+    Given: an el. with a typical Lorentz factor at redshift zero
     When: the inverse Compton loss rate is computed
-    Then: the result must be negative since electrons only lose energy
+    Then: the result must be negative since el. only lose energy
     """
     assert inverse_compton_loss(gamma=1e4, redshift=0.0) < 0
 
@@ -103,3 +103,59 @@ def test_inverse_compton_loss_scales_with_redshift():
     loss_z0 = inverse_compton_loss(gamma=1e4, redshift=0.0)
     loss_z1 = inverse_compton_loss(gamma=1e4, redshift=1.0)
     assert np.isclose(loss_z1 / loss_z0, 16.0, rtol=1e-5)
+
+
+"BREMMSTRAHLUNG LOSS TEST"
+
+def test_bremsstrahlung_loss_is_negative():
+    """Test that bremsstrahlung loss always removes energy from the el..
+
+    Given: an el. with a typical Lorentz factor in a typical plasma
+    When:  bremsstrahlung loss rate is computed
+    Then:  result must be negative since el. only lose energy
+    """
+    assert bremsstrahlung_loss(gamma=1e4, n_plasma=1e3) < 0
+
+
+def test_bremsstrahlung_loss_scales_with_gamma():
+    """Test that bremsstrahlung loss scales linearly with gamma.
+
+    Given: two el. with Lorentz factors differing by a factor of 2
+    When:  bremsstrahlung loss rate is computed for both
+    Then:  loss rate ratio must equal the gamma ratio
+    """
+    loss_1 = bremsstrahlung_loss(gamma=1e4, n_plasma=1e3)
+    loss_2 = bremsstrahlung_loss(gamma=2e4, n_plasma=1e3)
+    assert np.isclose(loss_2 / loss_1, 2.0, rtol=1e-5)
+
+
+def test_bremsstrahlung_loss_scales_with_n_plasma():
+    """Test that bremsstrahlung loss scales linearly with plasma density.
+
+   Given: two identical el. in plasmas with densities differing by factor 2
+ When:  bremsstrahlung loss rate is computed for both
+    Then:  loss rate ratio must equal the density ratio
+    """
+    loss_1 = bremsstrahlung_loss(gamma=1e4, n_plasma=1e3)
+    loss_2 = bremsstrahlung_loss(gamma=1e4, n_plasma=2e3)
+    assert np.isclose(loss_2 / loss_1, 2.0, rtol=1e-5)
+
+
+def test_bremsstrahlung_loss_is_zero_for_zero_density():
+    """Test that bremsstrahlung loss vanishes when there is no plasma.
+
+   Given: an el. with a typical Lorentz factor in an empty plasma
+ When:  bremsstrahlung loss rate is computed
+    Then:  result must be zero since there are no ions to scatter off
+    """
+    assert bremsstrahlung_loss(gamma=1e4, n_plasma=0.0) == 0.0
+
+
+
+
+
+
+
+
+
+
