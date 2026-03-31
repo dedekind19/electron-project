@@ -4,6 +4,7 @@ in a magnetized plasma.
 """
 
 import numpy as np
+from plasma_sim.constants import SIGMA_T, ALPHA_F, C
 
 
 def sample_gamma_powerlaw(
@@ -41,3 +42,35 @@ def sample_gamma_powerlaw(
         r * (gamma_max**exponent - gamma_min**exponent) + gamma_min**exponent
     ) ** (1 / exponent)
     return gamma
+
+def compute_interaction_probability(
+    gamma: float,
+    n_plasma: float,
+    dt: float,
+) -> float:
+    """Compute the probability of a Coulomb collision in a timestep dt.
+
+    Uses the Poisson process formula p = 1 - exp(-dt / t_collision)
+    where t_collision = 1 / (n_plasma * σ_coulomb(γ) * c)
+    and σ_coulomb(γ) = σ_T * ln(Λ) / (8 * α_f * γ)
+
+    Parameters
+    ----------
+    gamma : float
+        Lorentz factor of the electron (dimensionless)
+    n_plasma : float
+        Plasma electron number density (m^-3)
+    dt : float
+        Timestep (s)
+
+    Returns
+    -------
+    float
+        Probability of a Coulomb collision in dt, between 0 and 1
+    """
+    if n_plasma == 0.0:
+        return 0.0
+    COULOMB_LOG = 30.0
+    sigma_coulomb = SIGMA_T * COULOMB_LOG / (8 * ALPHA_F * gamma)
+    t_collision = 1 / (n_plasma * sigma_coulomb * C)
+    return 1 - np.exp(-dt / t_collision)

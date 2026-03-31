@@ -1,10 +1,8 @@
 """
 Tests for simulation functions in plasma_sim.simulation.
 """
-
 import numpy as np
-import pytest
-from plasma_sim.simulation import sample_gamma_powerlaw
+from plasma_sim.simulation import sample_gamma_powerlaw, compute_interaction_probability
 
 
 def test_sample_gamma_powerlaw_correct_number_of_samples():
@@ -78,8 +76,7 @@ def test_sample_gamma_powerlaw_different_seeds_differ():
     assert not np.allclose(samples1, samples2)
 
 
-    from plasma_sim.simulation import sample_gamma_powerlaw, compute_interaction_probability
-
+   
 
 def test_interaction_probability_between_zero_and_one():
     """Test that the interaction probability is always a valid probability.
