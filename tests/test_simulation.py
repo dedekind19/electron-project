@@ -76,3 +76,64 @@ def test_sample_gamma_powerlaw_different_seeds_differ():
         n_electrons=1000, rng=rng2
     )
     assert not np.allclose(samples1, samples2)
+
+
+    from plasma_sim.simulation import sample_gamma_powerlaw, compute_interaction_probability
+
+
+def test_interaction_probability_between_zero_and_one():
+    """Test that the interaction probability is always a valid probability.
+
+    GIVEN: typical plasma density, Lorentz factor and timestep
+    WHEN: the interaction probability is computed
+    THEN: the result must be between 0 and 1
+    """
+    p = compute_interaction_probability(gamma=1e4, n_plasma=1e3, dt=1e11)
+    assert 0 <= p <= 1
+
+
+def test_interaction_probability_zero_for_zero_density():
+    """Test that probability vanishes when there is no plasma.
+
+    GIVEN: zero plasma density
+    WHEN: the interaction probability is computed
+    THEN: the result must be zero since there are no ions to collide with
+    """
+    p = compute_interaction_probability(gamma=1e4, n_plasma=0.0, dt=1e11)
+    assert p == 0.0
+
+
+def test_interaction_probability_increases_with_density():
+    """Test that probability increases with plasma density.
+
+    GIVEN: two identical electrons in plasmas with different densities
+    WHEN: the interaction probability is computed for both
+    THEN: higher density must give higher probability
+    """
+    p1 = compute_interaction_probability(gamma=1e4, n_plasma=1e3, dt=1e11)
+    p2 = compute_interaction_probability(gamma=1e4, n_plasma=2e3, dt=1e11)
+    assert p2 > p1
+
+
+def test_interaction_probability_increases_with_dt():
+    """Test that probability increases with timestep.
+
+    GIVEN: two identical electrons with different timesteps
+    WHEN: the interaction probability is computed for both
+    THEN: longer timestep must give higher probability
+    """
+    p1 = compute_interaction_probability(gamma=1e4, n_plasma=1e3, dt=1e11)
+    p2 = compute_interaction_probability(gamma=1e4, n_plasma=1e3, dt=2e11)
+    assert p2 > p1
+
+
+def test_interaction_probability_decreases_with_gamma():
+    """Test that probability decreases with Lorentz factor.
+
+    GIVEN: two electrons with different Lorentz factors
+    WHEN: the interaction probability is computed for both
+    THEN: higher gamma must give lower probability since σ_coulomb ∝ 1/γ
+    """
+    p1 = compute_interaction_probability(gamma=1e4, n_plasma=1e3, dt=1e11)
+    p2 = compute_interaction_probability(gamma=2e4, n_plasma=1e3, dt=1e11)
+    assert p2 < p1
