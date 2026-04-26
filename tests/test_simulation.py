@@ -2,7 +2,7 @@
 Tests for simulation functions in plasma_sim.simulation.
 """
 import numpy as np
-from plasma_sim.simulation import sample_gamma_powerlaw, compute_interaction_probability
+from plasma_sim.simulation import sample_gamma_powerlaw, compute_interaction_probability, sample_new_B
 
 
 def test_sample_gamma_powerlaw_correct_number_of_samples():
@@ -134,3 +134,58 @@ def test_interaction_probability_decreases_with_gamma():
     p1 = compute_interaction_probability(gamma=1e4, n_plasma=1e3, dt=1e11)
     p2 = compute_interaction_probability(gamma=2e4, n_plasma=1e3, dt=1e11)
     assert p2 < p1
+
+
+MAGNETIC FIELD VARIATIONS
+
+
+def test_sample_new_B_zero_sigma_returns_initial():
+    """Test that zero sigma always returns the initial B value.
+
+    GIVEN: an initial B value and sigma_B = 0
+    WHEN: a new B is sampled
+    THEN: the result must equal B_initial exactly
+    """
+    rng = np.random.default_rng(42)
+    B = sample_new_B(B_initial=1e-9, sigma_B=0.0, rng=rng)
+    assert B == 1e-9
+
+
+def test_sample_new_B_is_positive():
+    """Test that sampled B values are always positive.
+
+    GIVEN: a typical initial B and sigma_B
+    WHEN: many B values are sampled
+    THEN: all results must be positive since negative B is unphysical
+    """
+    rng = np.random.default_rng(42)
+    samples = [sample_new_B(B_initial=1e-9, sigma_B=1e-10, rng=rng)
+               for _ in range(1000)]
+    assert all(b > 0 for b in samples)
+
+
+def test_sample_new_B_reproducible_with_seed():
+    """Test that the same seed always produces the same B value.
+
+    GIVEN: two RNG instances initialised with the same seed
+    WHEN: a new B is sampled from both
+    THEN: the two results must be identical
+    """
+    rng1 = np.random.default_rng(42)
+    rng2 = np.random.default_rng(42)
+    B1 = sample_new_B(B_initial=1e-9, sigma_B=1e-10, rng=rng1)
+    B2 = sample_new_B(B_initial=1e-9, sigma_B=1e-10, rng=rng2)
+    assert B1 == B2
+
+
+def test_sample_new_B_mean_close_to_initial():
+    """Test that the mean of many samples is close to B_initial.
+
+    GIVEN: a Gaussian centred on B_initial
+    WHEN: many B values are sampled
+    THEN: the sample mean must be close to B_initial
+    """
+    rng = np.random.default_rng(42)
+    samples = [sample_new_B(B_initial=1e-9, sigma_B=1e-10, rng=rng)
+               for _ in range(10000)]
+    assert np.isclose(np.mean(samples), 1e-9, rtol=0.05)
