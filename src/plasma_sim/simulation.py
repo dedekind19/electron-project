@@ -74,3 +74,37 @@ def compute_interaction_probability(
     sigma_coulomb = SIGMA_T * COULOMB_LOG / (8 * ALPHA_F * gamma)
     t_collision = 1 / (n_plasma * sigma_coulomb * C)
     return 1 - np.exp(-dt / t_collision)
+
+###############################
+#MAGNETIC FIELD VARIATION
+###############################
+
+def sample_new_B(
+    B_initial: float,
+    sigma_B: float,
+    rng: np.random.Generator,
+) -> float:
+    """ Models turbulent fluctuations in the lobe magnetic field by sampling
+    from a Gaussian centred on B_initial. If sigma_B is zero, returns
+    B_initial exactly. Negative values are rejected by resampling.
+
+    Parameters
+    ----------
+    B_initial : float
+        Central value of the magnetic field (T)
+    sigma_B : float
+        Standard deviation of the Gaussian (T)
+    rng : np.random.Generator
+        Random number generator instance for reproducibility
+
+    Returns
+    -------
+    float
+        New magnetic field value (T), always positive
+    """
+    if sigma_B == 0.0:
+        return B_initial
+    B = rng.normal(B_initial, sigma_B)
+    while B <= 0:
+        B = rng.normal(B_initial, sigma_B)
+    return B

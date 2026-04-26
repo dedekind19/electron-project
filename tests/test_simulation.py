@@ -135,9 +135,9 @@ def test_interaction_probability_decreases_with_gamma():
     p2 = compute_interaction_probability(gamma=2e4, n_plasma=1e3, dt=1e11)
     assert p2 < p1
 
-
-MAGNETIC FIELD VARIATIONS
-
+##########################
+#MAGNETIC FIELD VARIATIONS
+##########################
 
 def test_sample_new_B_zero_sigma_returns_initial():
     """Test that zero sigma always returns the initial B value.
