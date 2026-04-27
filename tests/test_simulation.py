@@ -210,14 +210,14 @@ def test_run_simulation_time_increases_monotonically():
             "epsilon_stop": 0.01, "t_snap": 1e15, "redshift": 0.0
         },
         "numerical": {
-            "dt": 1e11, "n_electrons": 10, "random_seed": 42,
+            "dt": 1e13, "n_electrons": 10, "random_seed": 42,
             "B_update_steps": 100
         }
     }
     results = run_simulation(config)
     time = results["time"]
     diffs = [time[i+1] - time[i] for i in range(len(time)-1)]
-    assert all(np.isclose(d, 1e11, rtol=1e-5) for d in diffs)
+    assert all(np.isclose(d, 1e13, rtol=1e-5) for d in diffs)
 
 
 def test_run_simulation_n_alive_only_decreases():
@@ -235,7 +235,7 @@ def test_run_simulation_n_alive_only_decreases():
             "epsilon_stop": 0.01, "t_snap": 1e15, "redshift": 0.0
         },
         "numerical": {
-            "dt": 1e11, "n_electrons": 10, "random_seed": 42,
+            "dt": 1e13, "n_electrons": 10, "random_seed": 42,
             "B_update_steps": 100
         }
     }
@@ -259,7 +259,7 @@ def test_run_simulation_gamma_mean_only_decreases():
             "epsilon_stop": 0.01, "t_snap": 1e15, "redshift": 0.0
         },
         "numerical": {
-            "dt": 1e11, "n_electrons": 10, "random_seed": 42,
+            "dt": 1e13, "n_electrons": 10, "random_seed": 42,
             "B_update_steps": 100
         }
     }
@@ -283,7 +283,7 @@ def test_run_simulation_loss_rates_are_negative():
             "epsilon_stop": 0.01, "t_snap": 1e15, "redshift": 0.0
         },
         "numerical": {
-            "dt": 1e11, "n_electrons": 10, "random_seed": 42,
+            "dt": 1e13, "n_electrons": 10, "random_seed": 42,
             "B_update_steps": 100
         }
     }
