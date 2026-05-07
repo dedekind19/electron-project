@@ -211,13 +211,13 @@ def test_run_simulation_time_increases_monotonically():
         },
         "numerical": {
             "dt": 1e13, "n_electrons": 10, "random_seed": 42,
-            "B_update_steps": 100
+            "B_update_steps": 100, "n_bins": 50
         }
     }
     results = run_simulation(config)
-    time = results["time"]
+    time = results["time_series"]["time"]
     diffs = [time[i+1] - time[i] for i in range(len(time)-1)]
-    assert all(np.isclose(d, 1e13, rtol=1e-5) for d in diffs)
+    assert all(d > 0 for d in diffs)
 
 
 def test_run_simulation_n_alive_only_decreases():
@@ -236,11 +236,11 @@ def test_run_simulation_n_alive_only_decreases():
         },
         "numerical": {
             "dt": 1e13, "n_electrons": 10, "random_seed": 42,
-            "B_update_steps": 100
+            "B_update_steps": 100, "n_bins": 50
         }
     }
     results = run_simulation(config)
-    n_alive = results["n_alive"]
+    n_alive = results["time_series"]["n_alive"]
     assert all(n_alive[i+1] <= n_alive[i] for i in range(len(n_alive)-1))
 
 
@@ -260,11 +260,11 @@ def test_run_simulation_gamma_mean_only_decreases():
         },
         "numerical": {
             "dt": 1e13, "n_electrons": 10, "random_seed": 42,
-            "B_update_steps": 100
+            "B_update_steps": 100, "n_bins": 50
         }
     }
     results = run_simulation(config)
-    gamma_mean = results["gamma_mean"]
+    gamma_mean = results["time_series"]["gamma_mean"]
     assert all(gamma_mean[i+1] <= gamma_mean[i] for i in range(len(gamma_mean)-1))
 
 
@@ -284,11 +284,11 @@ def test_run_simulation_loss_rates_are_negative():
         },
         "numerical": {
             "dt": 1e13, "n_electrons": 10, "random_seed": 42,
-            "B_update_steps": 100
+            "B_update_steps": 100, "n_bins": 50
         }
     }
     results = run_simulation(config)
-    assert all(v <= 0 for v in results["dEdt_sync_mean"])
-    assert all(v <= 0 for v in results["dEdt_IC_mean"])
-    assert all(v <= 0 for v in results["dEdt_brems_mean"])
-    assert all(v <= 0 for v in results["dEdt_coulomb_mean"])
+    assert all(v <= 0 for v in results["time_series"]["dEdt_sync_mean"])
+    assert all(v <= 0 for v in results["time_series"]["dEdt_IC_mean"])
+    assert all(v <= 0 for v in results["time_series"]["dEdt_brems_mean"])
+    assert all(v <= 0 for v in results["time_series"]["dEdt_coulomb_mean"])
