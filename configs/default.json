@@ -1,21 +1,19 @@
 {
   "physical": {
-    "B_field":         3e-10,
-    "sigma_B":         3e-10,
-    "n_plasma":        1e2,
-    "gamma_min_init":  100,
-    "gamma_max_init":  1e6,
-    "spectral_index":  2.0,
-    "gamma_min":       10.0,
-    "epsilon_stop":    0.01,
-    "t_snap":          1e12,
-    "redshift":        0.0
+    "B_field":        3e-10,
+    "sigma_B":        3e-11,
+    "n_plasma":       1e-1,
+    "gamma_min_init": 100,
+    "gamma_max_init": 1e6,
+    "spectral_index": 2.0,
+    "gamma_min":      10.0,
+    "epsilon_stop":   0.01,
+    "redshift":       0.0
   },
   "numerical": {
-    "dt":              1e9,
-    "n_electrons":     1000,
-    "n_bins":          50,
-    "random_seed":     42,
-    "B_update_steps":  100
+    "n_electrons":    1000,
+    "n_bins":         50,
+    "random_seed":    42,
+    "B_update_steps": 100
   }
 }
