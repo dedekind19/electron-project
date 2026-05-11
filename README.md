@@ -19,7 +19,7 @@ magnetized plasma.
 ### Assumptions
 
 - Electrons are **ultra-relativistic**, described by Lorentz factor γ >> 1
-- Magnetic field **B** is initialised by the user and updated every
+- Magnetic field B is initialised by the user and updated every
   `B_update_steps` timesteps by sampling from a Gaussian distribution
   centred on the initial value with s.d. `sigma_B`. This
   accounts for turbulent fluctuations.
@@ -62,7 +62,7 @@ An electron gyrating in magnetic field B radiates energy continuously:
 U_B = B² / (2 * μ₀)
 
 | Constant | Value | Description |
-|---|---|---|
+
 | σ_T | 6.6524 × 10⁻²⁹ m² | Thomson cross-section |
 | c | 2.9979 × 10⁸ m/s | Speed of light |
 | m_e | 9.1094 × 10⁻³¹ kg | Electron mass |
@@ -76,7 +76,7 @@ has the same form as synchrotron with U_B replaced by U_rad:
 U_rad = a_rad * T_CMB⁴ * (1 + z)⁴
 
 | Constant | Value | Description |
-|---|---|---|
+
 | a_rad | 7.5657 × 10⁻¹⁶ J m⁻³ K⁻⁴ | Radiation constant |
 | T_CMB | 2.7255 K | CMB temperature at z=0 |
 | U_rad(z=0) | 4.1719 × 10⁻¹⁴ J/m³ | CMB energy density at z=0 |
@@ -92,7 +92,7 @@ ionized hydrogen plasma (Z=1) in the relativistic regime:
 where 14.3 ≈ ln(183) + 1/18 is the numerical factor for Z=1.
 
 | Constant | Value | Description |
-|---|---|---|
+
 | α_f | 7.2974 × 10⁻³ (≈ 1/137) | Fine structure constant |
 | n_e | user parameter (m⁻³) | Plasma electron number density |
 
@@ -115,8 +115,8 @@ population evolves.
 ### Monte Carlo Method
 
 Synchrotron, inverse Compton and Bremsstrahlung are treated as
-**continuous** losses and applied at every timestep. Coulomb collisions
-are treated as **discrete stochastic events**: at each timestep, a random
+continuous losses and applied at every timestep. Coulomb collisions
+are treated as discrete stochastic events: at each timestep, a random
 number is drawn and compared to the interaction probability:
 p = 1 - exp(-dt / t_collision)
 t_collision = 1 / (n_plasma * σ_coulomb(γ) * c)
@@ -131,12 +131,10 @@ using the inverse transform method. The magnetic field is updated every
 `B_update_steps` timesteps by sampling from a Gaussian centred on the
 initial value.
 
-Each electron evolves with an **adaptive timestep** computed from its
+Each electron evolves with an adaptive timestep computed from its
 current cooling time:
 dt = 0.01 * γ / |dγ/dt_total|
 
-This ensures accuracy across the full range of γ values without
-requiring the user to manually tune the timestep.
 
 ---
 
@@ -167,7 +165,8 @@ python -m plasma_sim run --config configs/default.json --output results/
 ## Configuration
 
 All parameters are split into two sections: `physical` for the
-plasma system and `numerical` for the simulation itself.
+plasma system and `numerical` for the simulation itself. The default parameters are the ones found in radio galxy lobes in condition of equipartition (U_B=U_rad). They can be cahnged in the following json:
+
 
 Example `configs/default.json`:
 
@@ -198,7 +197,7 @@ Example `configs/default.json`:
 ### Physical parameters
 
 | Parameter | Description | Default | Units | Valid range |
-|---|---|---|---|---|
+
 | B_field | Magnetic field strength | 3e-10 | T | > 0 |
 | sigma_B | Standard deviation of B fluctuations | 3e-11 | T | ≥ 0 |
 | n_plasma | Plasma electron number density | 1e2 | m⁻³ | > 0 |
@@ -212,7 +211,7 @@ Example `configs/default.json`:
 ### Numerical parameters
 
 | Parameter | Description | Default | Units | Valid range |
-|---|---|---|---|---|
+
 | n_electrons | Number of simulated electrons | 1000 | — | ≥ 1 |
 | n_bins | Number of bins for all histograms | 50 | — | ≥ 10 |
 | random_seed | Random seed for reproducibility | 42 | — | any integer |
@@ -221,7 +220,7 @@ Example `configs/default.json`:
 ### Validation and warnings
 
 | Condition | Type | Reason |
-|---|---|---|
+
 | B_field ≤ 0 or n_plasma ≤ 0 | Error | Unphysical |
 | sigma_B < 0 | Error | Unphysical |
 | gamma_min_init ≥ gamma_max_init | Error | Empty sampling range |
@@ -272,6 +271,12 @@ directory with the following structure:
   }
 }
 ```
+## Plotting
+The following command is used to generate some plot derived from the quantities in the Json. These are just exemplary, the code that generates them is in 'plot.py' The file with all the data is stored in the same folder:
+```bash
+python -m plasma_sim plot --input results/results.json --output results/
+
+
 
 ---
 
