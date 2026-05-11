@@ -1,9 +1,9 @@
 {
   "physical": {
-    "B_field":        3e-10,
+    "B_field":        3.24e-10,
     "sigma_B":        3e-11,
-    "n_plasma":       1e-1,
-    "gamma_min_init": 100,
+    "n_plasma":       1e2,
+    "gamma_min_init": 1000,
     "gamma_max_init": 1e6,
     "spectral_index": 2.0,
     "gamma_min":      10.0,
