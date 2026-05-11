@@ -90,7 +90,7 @@ def plot_loss_rates_vs_gamma(results: dict, output_path: str = None):
     results : dict
         Results dictionary from run_simulation
     output_path : str, optional
-        Path to save the figure. If None, displays interactively.
+        Path to save the figure. If none, displays interactively.
     """
     gamma_bins = np.array(results["losses_vs_gamma"]["gamma_bins"])
     sync = np.abs(results["losses_vs_gamma"]["dEdgamma_sync"])
@@ -126,7 +126,7 @@ def plot_energy_fractions_vs_time(results: dict, output_path: str = None):
     results : dict
         Results dictionary from run_simulation
     output_path : str, optional
-        Path to save the figure. If None, displays interactively.
+        Path to save the figure. If none, displays interactively.
     """
     time = np.array(results["time_series"]["time"])
     time_years = time / 3.15e7
